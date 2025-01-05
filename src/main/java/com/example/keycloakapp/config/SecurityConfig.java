@@ -1,8 +1,8 @@
 package com.example.keycloakapp.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.AbstractConfiguredSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -18,23 +18,24 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
+    @Value("${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
+    private String issuerUri;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login").anonymous() // Открытые эндпоинты
-                        .anyRequest().authenticated()             // Защита остальных
+                        .requestMatchers("/api/v1/auth/login").anonymous()
+                        .anyRequest().authenticated()
                 )
                 .csrf( AbstractHttpConfigurer::disable)
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("http://localhost:8080/oauth2/authorization/keycloak") // URL для авторизации через Keycloak
+                        .loginPage("http://localhost:8080/oauth2/authorization/keycloak")
                 )
-                .oauth2Client(client -> {
-                    // Здесь можно настроить OAuth2 Client, если нужно
-                })
+                .oauth2Client(client -> {})
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwtConfigurer -> jwtConfigurer
-                                .decoder(jwtDecoder()) // Настройка JWT декодера
+                                .decoder(jwtDecoder())
                         )
                 );
 
@@ -43,10 +44,8 @@ public class SecurityConfig {
 
     @Bean
     public NimbusJwtDecoder jwtDecoder() {
-        String issuerUri = "http://localhost:8080/realms/master"; // Ваш issuer (URI из Keycloak)
         NimbusJwtDecoder jwtDecoder = JwtDecoders.fromIssuerLocation(issuerUri);
 
-        // Добавляем валидацию токенов
         jwtDecoder.setJwtValidator(new DelegatingOAuth2TokenValidator<Jwt>(
                 new JwtIssuerValidator(issuerUri),
                 new JwtTimestampValidator()

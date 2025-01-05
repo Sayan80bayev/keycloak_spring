@@ -22,8 +22,6 @@ public class AuthServiceImpl implements AuthService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    @Value("${spring.security.oauth2.client.provider.keycloak.issuer-uri}")
-    private String issuer;
 
     @Value("${spring.security.oauth2.client.registration.keycloak.client-id}")
     private String clientId;
@@ -45,7 +43,7 @@ public class AuthServiceImpl implements AuthService {
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.add("client_id", clientId);
         requestBody.add("client_secret", secret);
-        requestBody.add("grant_type", "password");
+        requestBody.add("grant_type", grantType);
         requestBody.add("username", loginRequest.getEmail());
         requestBody.add("password", loginRequest.getPassword());
 

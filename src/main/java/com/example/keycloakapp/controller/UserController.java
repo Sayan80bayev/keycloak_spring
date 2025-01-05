@@ -4,7 +4,6 @@ import com.example.keycloakapp.dto.request.LoginRequest;
 import com.example.keycloakapp.dto.response.LoginResponse;
 import com.example.keycloakapp.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
